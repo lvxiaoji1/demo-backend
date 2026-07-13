@@ -1,0 +1,24 @@
+# Java
+demo-backend/target/
+demo-backend/*.log
+demo-backend/logs/
+*.class
+*.jar
+*.war
+
+# Maven
+demo-backend/.mvn/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Node
+demo-frontend/node_modules/
+demo-frontend/dist/
+demo-frontend/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

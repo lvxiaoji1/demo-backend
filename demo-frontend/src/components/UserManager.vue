@@ -1,34 +1,34 @@
 <template>
     <div class="container">
         <div class="form-card">
-            <h3>{{ editing ? 'Edit User' : 'Create User' }}</h3>
+            <h3>{{ editing ? '编辑用户' : '创建用户' }}</h3>
             <div class="form-row">
-                <input v-model="form.name" placeholder="Name" />
-                <input v-model="form.email" placeholder="Email" />
-                <input v-model.number="form.age" type="number" placeholder="Age" />
+                <input v-model="form.name" placeholder="姓名" />
+                <input v-model="form.email" placeholder="邮箱" />
+                <input v-model.number="form.age" type="number" placeholder="年龄" />
                 <button @click="save" :disabled="!form.name || !form.email">
-                    {{ editing ? 'Update' : 'Create' }}
+                    {{ editing ? '更新' : '创建' }}
                 </button>
-                <button v-if="editing" @click="cancelEdit" class="cancel">Cancel</button>
+                <button v-if="editing" @click="cancelEdit" class="cancel">取消</button>
             </div>
         </div>
 
         <div class="table-card">
-            <h3>User List</h3>
+            <h3>用户列表</h3>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Age</th>
-                        <th>Created</th>
-                        <th>Actions</th>
+                        <th>姓名</th>
+                        <th>邮箱</th>
+                        <th>年龄</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="loading"><td colspan="6" class="loading">Loading...</td></tr>
-                    <tr v-else-if="users.length === 0"><td colspan="6" class="empty">No users yet</td></tr>
+                    <tr v-if="loading"><td colspan="6" class="loading">加载中...</td></tr>
+                    <tr v-else-if="users.length === 0"><td colspan="6" class="empty">暂无用户</td></tr>
                     <tr v-for="user in users" :key="user.id">
                         <td>{{ user.id }}</td>
                         <td>{{ user.name }}</td>
@@ -36,8 +36,8 @@
                         <td>{{ user.age }}</td>
                         <td>{{ user.createTime }}</td>
                         <td class="actions">
-                            <button @click="edit(user)" class="edit">Edit</button>
-                            <button @click="remove(user.id)" class="delete">Delete</button>
+                            <button @click="edit(user)" class="edit">编辑</button>
+                            <button @click="remove(user.id)" class="delete">删除</button>
                         </td>
                     </tr>
                 </tbody>
@@ -59,9 +59,9 @@ const form = ref({ name: '', email: '', age: null })
 const fetchUsers = async () => {
     try {
         const res = await userApi.findAll()
-        users.value = res.data
+        users.value = res.data || res
     } catch (e) {
-        console.error('Failed to fetch users:', e)
+        console.error(e)
     } finally {
         loading.value = false
     }
@@ -79,7 +79,7 @@ const save = async () => {
         editingId.value = null
         await fetchUsers()
     } catch (e) {
-        console.error('Save failed:', e)
+        console.error(e)
     }
 }
 
@@ -100,7 +100,7 @@ const remove = async (id) => {
         await userApi.delete(id)
         await fetchUsers()
     } catch (e) {
-        console.error('Delete failed:', e)
+        console.error(e)
     }
 }
 

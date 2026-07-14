@@ -1,54 +1,54 @@
 <template>
     <div class="container">
         <div class="form-card">
-            <h3>{{ editing ? 'Edit Article' : 'Create Article' }}</h3>
+            <h3>{{ editing ? '编辑文章' : '创建文章' }}</h3>
             <div class="form-row">
-                <input v-model="form.title" placeholder="Title" />
+                <input v-model="form.title" placeholder="标题" />
                 <select v-model="form.userId" v-if="!editing">
-                    <option value="" disabled>Select author</option>
+                    <option value="" disabled>选择作者</option>
                     <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option>
                 </select>
                 <button @click="save" :disabled="!form.title || !form.content || (!editing && !form.userId)">
-                    {{ editing ? 'Update' : 'Create' }}
+                    {{ editing ? '更新' : '创建' }}
                 </button>
-                <button v-if="editing" @click="cancelEdit" class="cancel">Cancel</button>
+                <button v-if="editing" @click="cancelEdit" class="cancel">取消</button>
             </div>
-            <textarea v-model="form.content" placeholder="Content" rows="4"></textarea>
+            <textarea v-model="form.content" placeholder="内容" rows="4"></textarea>
         </div>
 
         <div class="table-card">
-            <h3>Article List</h3>
+            <h3>文章列表</h3>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Created</th>
-                        <th>Actions</th>
+                        <th>标题</th>
+                        <th>作者</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="loading"><td colspan="5" class="loading">Loading...</td></tr>
-                    <tr v-else-if="articles.length === 0"><td colspan="5" class="empty">No articles yet</td></tr>
+                    <tr v-if="loading"><td colspan="5" class="loading">加载中...</td></tr>
+                    <tr v-else-if="articles.length === 0"><td colspan="5" class="empty">暂无文章</td></tr>
                     <tr v-for="a in articles" :key="a.id">
                         <td>{{ a.id }}</td>
                         <td>{{ a.title }}</td>
                         <td>{{ a.authorName }}</td>
                         <td>{{ a.createTime }}</td>
                         <td class="actions">
-                            <button @click="edit(a)" class="edit">Edit</button>
-                            <button @click="remove(a.id)" class="delete">Delete</button>
+                            <button @click="edit(a)" class="edit">编辑</button>
+                            <button @click="remove(a.id)" class="delete">删除</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <div class="pagination" v-if="totalPages > 1">
-                <button @click="goPage(0)" :disabled="page === 0">First</button>
-                <button @click="goPage(page - 1)" :disabled="page === 0">Prev</button>
-                <span>Page {{ page + 1 }} / {{ totalPages }}</span>
-                <button @click="goPage(page + 1)" :disabled="page >= totalPages - 1">Next</button>
-                <button @click="goPage(totalPages - 1)" :disabled="page >= totalPages - 1">Last</button>
+                <button @click="goPage(0)" :disabled="page === 0">首页</button>
+                <button @click="goPage(page - 1)" :disabled="page === 0">上一页</button>
+                <span>第 {{ page + 1 }} / {{ totalPages }} 页</span>
+                <button @click="goPage(page + 1)" :disabled="page >= totalPages - 1">下一页</button>
+                <button @click="goPage(totalPages - 1)" :disabled="page >= totalPages - 1">末页</button>
             </div>
         </div>
     </div>

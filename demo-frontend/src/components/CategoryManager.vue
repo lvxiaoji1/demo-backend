@@ -1,34 +1,34 @@
 <template>
     <div class="container">
         <div class="form-card">
-            <h3>Create Category</h3>
+            <h3>创建分类</h3>
             <div class="form-row">
-                <input v-model="form.name" placeholder="Category name" />
-                <input v-model="form.description" placeholder="Description (optional)" />
-                <button @click="save" :disabled="!form.name">Create</button>
+                <input v-model="form.name" placeholder="分类名称" />
+                <input v-model="form.description" placeholder="描述（选填）" />
+                <button @click="save" :disabled="!form.name">创建</button>
             </div>
         </div>
 
         <div class="table-card">
-            <h3>Category List</h3>
+            <h3>分类列表</h3>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Actions</th>
+                        <th>名称</th>
+                        <th>描述</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="loading"><td colspan="4" class="loading">Loading...</td></tr>
-                    <tr v-else-if="categories.length === 0"><td colspan="4" class="empty">No categories yet</td></tr>
+                    <tr v-if="loading"><td colspan="4" class="loading">加载中...</td></tr>
+                    <tr v-else-if="categories.length === 0"><td colspan="4" class="empty">暂无分类</td></tr>
                     <tr v-for="c in categories" :key="c.id">
                         <td>{{ c.id }}</td>
                         <td>{{ c.name }}</td>
                         <td>{{ c.description || '-' }}</td>
                         <td class="actions">
-                            <button @click="remove(c.id)" class="delete">Delete</button>
+                            <button @click="remove(c.id)" class="delete">删除</button>
                         </td>
                     </tr>
                 </tbody>

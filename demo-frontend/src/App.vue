@@ -1,9 +1,9 @@
 <template>
     <div class="app">
         <div class="nav">
-            <router-link to="/users" class="nav-link">Users</router-link>
-            <router-link to="/articles" class="nav-link">Articles</router-link>
-            <router-link to="/categories" class="nav-link">Categories</router-link>
+            <router-link to="/users" class="nav-link">用户管理</router-link>
+            <router-link to="/articles" class="nav-link">文章管理</router-link>
+            <router-link to="/categories" class="nav-link">分类管理</router-link>
         </div>
         <router-view />
     </div>

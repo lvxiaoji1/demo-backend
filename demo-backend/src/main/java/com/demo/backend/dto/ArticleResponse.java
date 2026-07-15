@@ -10,6 +10,8 @@ public class ArticleResponse {
     private String content;
     private Long authorId;
     private String authorName;
+    private Long categoryId;
+    private String categoryName;
     private LocalDateTime createTime;
 
     public static ArticleResponse from(Article article) {
@@ -20,6 +22,10 @@ public class ArticleResponse {
         r.authorId = article.getUser().getId();
         r.authorName = article.getUser().getName();
         r.createTime = article.getCreateTime();
+        if (article.getCategory() != null) {
+            r.categoryId = article.getCategory().getId();
+            r.categoryName = article.getCategory().getName();
+        }
         return r;
     }
 
@@ -28,5 +34,7 @@ public class ArticleResponse {
     public String getContent() { return content; }
     public Long getAuthorId() { return authorId; }
     public String getAuthorName() { return authorName; }
+    public Long getCategoryId() { return categoryId; }
+    public String getCategoryName() { return categoryName; }
     public LocalDateTime getCreateTime() { return createTime; }
 }

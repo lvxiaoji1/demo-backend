@@ -8,6 +8,10 @@
                     <option value="" disabled>选择作者</option>
                     <option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option>
                 </select>
+                <select v-model="form.categoryId" v-if="!editing">
+                    <option value="">选择分类（可选）</option>
+                    <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+                </select>
                 <button @click="save" :disabled="!form.title || !form.content || (!editing && !form.userId)">
                     {{ editing ? '更新' : '创建' }}
                 </button>
@@ -20,21 +24,16 @@
             <h3>文章列表</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>标题</th>
-                        <th>作者</th>
-                        <th>创建时间</th>
-                        <th>操作</th>
-                    </tr>
+                    <tr><th>ID</th><th>标题</th><th>作者</th><th>分类</th><th>创建时间</th><th>操作</th></tr>
                 </thead>
                 <tbody>
-                    <tr v-if="loading"><td colspan="5" class="loading">加载中...</td></tr>
-                    <tr v-else-if="articles.length === 0"><td colspan="5" class="empty">暂无文章</td></tr>
+                    <tr v-if="loading"><td colspan="6" class="loading">加载中...</td></tr>
+                    <tr v-else-if="articles.length === 0"><td colspan="6" class="empty">暂无文章</td></tr>
                     <tr v-for="a in articles" :key="a.id">
                         <td>{{ a.id }}</td>
                         <td>{{ a.title }}</td>
                         <td>{{ a.authorName }}</td>
+                        <td>{{ a.categoryName || '-' }}</td>
                         <td>{{ a.createTime }}</td>
                         <td class="actions">
                             <button @click="edit(a)" class="edit">编辑</button>
@@ -56,14 +55,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { articleApi, userApi } from '../api/index.js'
+import { articleApi, userApi, categoryApi } from '../api/index.js'
 
 const articles = ref([])
 const users = ref([])
+const categories = ref([])
 const loading = ref(true)
 const editing = ref(false)
 const editingId = ref(null)
-const form = ref({ title: '', content: '', userId: '' })
+const form = ref({ title: '', content: '', userId: '', categoryId: '' })
 const page = ref(0)
 const size = ref(10)
 const totalPages = ref(0)
@@ -74,69 +74,50 @@ const fetchArticles = async () => {
         const res = await articleApi.findAll(page.value, size.value)
         articles.value = res.data.content || res.data
         totalPages.value = res.data.totalPages || 1
-    } catch (e) {
-        console.error(e)
-    } finally {
-        loading.value = false
-    }
+    } catch (e) { console.error(e) } finally { loading.value = false }
 }
 
 const fetchUsers = async () => {
-    try {
-        const res = await userApi.findAll()
-        users.value = res.data || res
-    } catch (e) {
-        console.error(e)
-    }
+    try { const res = await userApi.findAll(); users.value = res.data || res } catch (e) {}
 }
 
-const goPage = (p) => {
-    page.value = p
-    fetchArticles()
+const fetchCategories = async () => {
+    try { const res = await categoryApi.findAll(); categories.value = res.data || res } catch (e) {}
 }
+
+const goPage = (p) => { page.value = p; fetchArticles() }
 
 const save = async () => {
     try {
+        const data = { title: form.value.title, content: form.value.content }
         if (editing.value) {
-            await articleApi.update(editingId.value, { title: form.value.title, content: form.value.content })
+            await articleApi.update(editingId.value, data)
         } else {
-            await articleApi.create({ title: form.value.title, content: form.value.content, userId: Number(form.value.userId) })
+            data.userId = Number(form.value.userId)
+            data.categoryId = form.value.categoryId ? Number(form.value.categoryId) : null
+            await articleApi.create(data)
         }
-        form.value = { title: '', content: '', userId: '' }
-        editing.value = false
-        editingId.value = null
-        page.value = 0
+        form.value = { title: '', content: '', userId: '', categoryId: '' }
+        editing.value = false; editingId.value = null; page.value = 0
         await fetchArticles()
-    } catch (e) {
-        console.error(e)
-    }
+    } catch (e) { console.error(e) }
 }
 
 const edit = (a) => {
-    editing.value = true
-    editingId.value = a.id
-    form.value = { title: a.title, content: a.content, userId: '' }
+    editing.value = true; editingId.value = a.id
+    form.value = { title: a.title, content: a.content, userId: '', categoryId: '' }
 }
 
 const cancelEdit = () => {
-    editing.value = false
-    editingId.value = null
-    form.value = { title: '', content: '', userId: '' }
+    editing.value = false; editingId.value = null
+    form.value = { title: '', content: '', userId: '', categoryId: '' }
 }
 
 const remove = async (id) => {
-    try {
-        await articleApi.delete(id)
-        await fetchArticles()
-    } catch (e) {
-        console.error(e)
-    }
+    try { await articleApi.delete(id); await fetchArticles() } catch (e) {}
 }
 
-onMounted(() => {
-    fetchUsers()
-    fetchArticles()
-})
+onMounted(() => { fetchUsers(); fetchCategories(); fetchArticles() })
 </script>
 
 <style scoped>

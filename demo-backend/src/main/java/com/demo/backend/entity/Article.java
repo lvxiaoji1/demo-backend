@@ -28,6 +28,10 @@ public class Article {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(name = "create_time", updatable = false)
     private LocalDateTime createTime;
 

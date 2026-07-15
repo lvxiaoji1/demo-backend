@@ -1,10 +1,4 @@
 #!/bin/bash
-
-# ===== 使用说明 =====
-# 1. 本地改完代码: git add -A && git commit -m "xxx" && git push
-# 2. SSH 连上服务器: ssh root@118.178.139.197
-# 3. 执行部署:      /root/deploy.sh
-
 set -e
 
 echo "===== 1. 拉取最新代码 ====="
@@ -42,9 +36,11 @@ fi
 echo "===== 5. 构建前端 ====="
 cd /root/demo-backend/demo-frontend
 npm install
+rm -rf dist
 npm run build
 
-echo "===== 6. 复制前端文件 ====="
+echo "===== 6. 复制前端文件（先清旧文件） ====="
+rm -rf /var/www/demo-backend/*
 cp -r dist/* /var/www/demo-backend/
 
 echo ""

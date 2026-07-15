@@ -3,9 +3,11 @@ package com.demo.backend.service;
 import com.demo.backend.dto.ArticleCreateDTO;
 import com.demo.backend.dto.ArticleUpdateDTO;
 import com.demo.backend.entity.Article;
+import com.demo.backend.entity.Category;
 import com.demo.backend.entity.User;
 import com.demo.backend.exception.BusinessException;
 import com.demo.backend.repository.ArticleRepository;
+import com.demo.backend.repository.CategoryRepository;
 import com.demo.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +20,14 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository) {
+    public ArticleService(ArticleRepository articleRepository,
+                          UserRepository userRepository,
+                          CategoryRepository categoryRepository) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public Article create(ArticleCreateDTO dto) {
@@ -31,6 +37,13 @@ public class ArticleService {
         article.setTitle(dto.getTitle());
         article.setContent(dto.getContent());
         article.setUser(user);
+
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new BusinessException(404, "category not found: " + dto.getCategoryId()));
+            article.setCategory(category);
+        }
+
         return articleRepository.save(article);
     }
 
@@ -51,7 +64,6 @@ public class ArticleService {
         return articleRepository.findByUserId(userId);
     }
 
-    // 按关键词搜索（分页）
     public Page<Article> search(String keyword, Pageable pageable) {
         return articleRepository.search(keyword, pageable);
     }

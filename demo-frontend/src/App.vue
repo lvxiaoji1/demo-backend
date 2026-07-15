@@ -2,6 +2,7 @@
     <div class="app">
         <div class="nav" v-if="isLoggedIn">
             <div class="nav-left">
+                <router-link to="/dashboard" class="nav-link">仪表盘</router-link>
                 <router-link to="/users" class="nav-link">用户管理</router-link>
                 <router-link to="/articles" class="nav-link">文章管理</router-link>
                 <router-link to="/categories" class="nav-link">分类管理</router-link>

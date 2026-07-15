@@ -4,6 +4,7 @@ const api = axios.create({
     baseURL: '/api'
 })
 
+// 自动解包 ApiResponse
 api.interceptors.response.use(
     response => {
         const body = response.data
@@ -17,10 +18,29 @@ api.interceptors.response.use(
         return response
     },
     error => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            window.location.hash = '#/login'
+        }
         const msg = error.response?.data?.message || error.message
         return Promise.reject(new Error(msg))
     }
 )
+
+// 请求拦截器：自动带 token
+api.interceptors.request.use(config => {
+    const token = localStorage.getItem('token')
+    if (token) {
+        config.headers.Authorization = 'Bearer ' + token
+    }
+    return config
+})
+
+export const authApi = {
+    login: (data) => api.post('/auth/login', data),
+    register: (data) => api.post('/auth/register', data)
+}
 
 export const userApi = {
     findAll: () => api.get('/users'),

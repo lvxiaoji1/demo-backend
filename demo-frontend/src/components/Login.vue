@@ -1,19 +1,19 @@
 <template>
     <div class="login-container">
         <div class="login-card">
-            <h2>{{ isLogin ? 'Login' : 'Register' }}</h2>
+            <h2>{{ isLogin ? '登录' : '注册' }}</h2>
             <div class="toggle">
-                <button :class="{ active: isLogin }" @click="isLogin = true">Login</button>
-                <button :class="{ active: !isLogin }" @click="isLogin = false">Register</button>
+                <button :class="{ active: isLogin }" @click="isLogin = true">登录</button>
+                <button :class="{ active: !isLogin }" @click="isLogin = false">注册</button>
             </div>
 
             <div class="form">
-                <input v-if="!isLogin" v-model="form.name" placeholder="Name" />
-                <input v-model="form.email" placeholder="Email" />
-                <input v-model="form.password" type="password" placeholder="Password" />
+                <input v-if="!isLogin" v-model="form.name" placeholder="昵称" />
+                <input v-model="form.email" placeholder="邮箱" />
+                <input v-model="form.password" type="password" placeholder="密码" />
                 <p v-if="error" class="error">{{ error }}</p>
                 <button @click="submit" :disabled="loading">
-                    {{ loading ? 'Please wait...' : (isLogin ? 'Login' : 'Register') }}
+                    {{ loading ? '请稍候...' : (isLogin ? '登录' : '注册') }}
                 </button>
             </div>
         </div>
@@ -35,13 +35,21 @@ const submit = async () => {
     error.value = ''
     loading.value = true
     try {
-        const fn = isLogin.value ? authApi.login : authApi.register
-        const res = await fn({
-            name: form.value.name,
-            email: form.value.email,
-            password: form.value.password
-        })
-        const data = res.data || res
+        let data
+        if (isLogin.value) {
+            const res = await authApi.login({
+                email: form.value.email,
+                password: form.value.password
+            })
+            data = res.data || res
+        } else {
+            const res = await authApi.register({
+                name: form.value.name,
+                email: form.value.email,
+                password: form.value.password
+            })
+            data = res.data || res
+        }
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify({ id: data.userId, name: data.name, email: data.email }))
         router.push('/users')

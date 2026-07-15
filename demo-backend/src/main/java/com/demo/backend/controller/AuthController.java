@@ -2,13 +2,13 @@ package com.demo.backend.controller;
 
 import com.demo.backend.dto.*;
 import com.demo.backend.entity.User;
+import com.demo.backend.exception.BusinessException;
 import com.demo.backend.repository.UserRepository;
 import com.demo.backend.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,7 +28,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest req) {
         if (userRepository.findByEmail(req.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email already exists");
+            throw new BusinessException(400, "该邮箱已被注册");
         }
 
         User user = new User();
@@ -44,10 +44,10 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest req) {
         User user = userRepository.findByEmail(req.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid email or password"));
+                .orElseThrow(() -> new BusinessException(401, "邮箱或密码错误"));
 
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid email or password");
+            throw new BusinessException(401, "邮箱或密码错误");
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail());

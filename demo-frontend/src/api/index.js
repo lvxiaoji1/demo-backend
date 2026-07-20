@@ -66,3 +66,12 @@ export const categoryApi = {
     create: (data) => api.post('/categories', data),
     delete: (id) => api.delete('/categories/' + id)
 }
+
+export const taskApi = {
+    findAll: () => api.get('/tasks'),
+    findById: (id) => api.get('/tasks/' + id),
+    create: (data) => api.post('/tasks', data),
+    update: (id, data) => api.put('/tasks/' + id, data),
+    delete: (id) => api.delete('/tasks/' + id),
+    toggle: (id) => api.patch('/tasks/' + id + '/toggle')
+}
